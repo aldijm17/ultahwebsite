@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Special Birthday Journey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        .terminal-text { font-family: 'Courier New', Courier, monospace; }
+        .scratch-container { position: relative; width: 300px; height: 200px; margin: auto; }
+        canvas { position: absolute; top: 0; left: 0; cursor: crosshair; }
+    </style>
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+
+    <section class="h-screen flex flex-col justify-center items-center p-5">
+        <div class="w-full max-w-2xl bg-gray-900 p-6 rounded-lg border border-green-500 shadow-lg shadow-green-500/20">
+            <div class="terminal-text text-green-500 mb-4">> SYSTEM_INITIALIZING...</div>
+            <div class="terminal-text text-green-500 mb-4">> ACCESS_DENIED. PLEASE IDENTIFY.</div>
+            <div id="quest-area">
+                <p class="mb-2 italic text-gray-400">"Apa nama tempat pertama kali kita makan bareng?"</p>
+                <input type="text" id="password" class="bg-transparent border-b border-green-500 outline-none text-green-400 w-full mb-4">
+                <button onclick="checkAccess()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition">Verify Identity</button>
+            </div>
+        </div>
+    </section>
+
+    <main id="main-content" class="hidden">
+        
+        <section class="py-20 px-10">
+            <h2 class="text-4xl font-bold text-center mb-10" data-aos="fade-up">Our Timeline</h2>
+            <div class="space-y-20">
+                <div class="flex flex-col md:flex-row items-center" data-aos="fade-right">
+                    <div class="w-full md:w-1/2 p-4 text-2xl">"Hari di mana semuanya dimulai..."</div>
+                    <div class="w-full md:w-1/2 bg-gray-800 h-64 rounded-lg flex items-center justify-center">[Foto 1]</div>
+                </div>
+                <div class="flex flex-col md:flex-row-reverse items-center" data-aos="fade-left">
+                    <div class="w-full md:w-1/2 p-4 text-2xl text-right">"Petualangan pertama kita."</div>
+                    <div class="w-full md:w-1/2 bg-gray-800 h-64 rounded-lg flex items-center justify-center">[Foto 2]</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 bg-gray-900 text-center">
+            <h2 class="text-3xl font-bold mb-6">Gosok untuk lihat pesan rahasia</h2>
+            <div class="scratch-container">
+                <div class="absolute inset-0 flex items-center justify-center bg-white text-black p-4 rounded text-center">
+                    "Kamu adalah alasan aku terus belajar koding setiap hari. Happy Birthday!"
+                </div>
+                <canvas id="scratch-canvas" width="300" height="200"></canvas>
+            </div>
+        </section>
+
+        <section class="py-20 px-5 max-w-4xl mx-auto">
+            <div class="bg-gradient-to-br from-green-400 to-blue-500 p-8 rounded-3xl text-black">
+                <h2 class="text-3xl font-black mb-6 italic text-center">YOUR YEAR IN REVIEW</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/20 p-4 rounded-xl">
+                        <p class="text-xs uppercase font-bold text-black/60">Total Memories</p>
+                        <p class="text-2xl font-bold">365 Days</p>
+                    </div>
+                    <div class="bg-white/20 p-4 rounded-xl">
+                        <p class="text-xs uppercase font-bold text-black/60">Laugh Tracks</p>
+                        <p class="text-2xl font-bold">Infinite</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        AOS.init();
+
+        function checkAccess() {
+            const pass = document.getElementById('password').value.toLowerCase();
+            if(pass === 'kantin') { // Ganti dengan jawabanmu
+                document.getElementById('main-content').classList.remove('hidden');
+                window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+                confetti();
+            } else {
+                alert('Wrong Answer! Coba ingat lagi.');
+            }
+        }
+
+        // Scratch Card Logic
+        const canvas = document.getElementById('scratch-canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#888';
+        ctx.fillRect(0, 0, 300, 200);
+
+        let isDrawing = false;
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mousemove', (e) => {
+            if(!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    </script>
+</body>
+</html>
