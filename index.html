@@ -275,7 +275,7 @@
         <div class="gate-kanji">桜</div>
         <p class="gate-title">Ada sesuatu untukmu di sini.</p>
         <div class="gate-divider"></div>
-        <p class="gate-hint">// kata panikmu yang paling ikonik</p>
+        <p class="gate-hint">// HINT siapa nama mu?</p>
         <input type="text" id="password" class="gate-input" placeholder="ketikkan di sini…" />
         <br>
         <button class="gate-btn" onclick="checkAccess()">
@@ -463,7 +463,7 @@
     // Gate
     function checkAccess() {
         const val = document.getElementById('password').value.toLowerCase().trim();
-        if (val === 'anjir') {
+        if (val === 'fadila') {
             const gate = document.getElementById('gate');
             gate.classList.add('exit');
             setTimeout(() => gate.style.display = 'none', 800);
