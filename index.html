@@ -3,108 +3,518 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Special Birthday Journey</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <title>Happy Birthday 🌸</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Noto+Serif+JP:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        .terminal-text { font-family: 'Courier New', Courier, monospace; }
-        .scratch-container { position: relative; width: 300px; height: 200px; margin: auto; }
-        canvas { position: absolute; top: 0; left: 0; cursor: crosshair; }
+        :root {
+            --ink: #1a1018;
+            --soft-ink: #3d2a3a;
+            --muted: #8a7088;
+            --subtle: #c4afc0;
+            --cream: #fdf8f5;
+            --warm: #f9f0ea;
+            --sakura: #e8b4c0;
+            --sakura-deep: #c87890;
+            --gold: #c8983a;
+            --paper: #fefcfa;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--ink);
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: var(--sakura); }
+
+        /* PETALS */
+        #petals { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .petal { position: absolute; opacity: 0; animation: fallPetal linear infinite; }
+        @keyframes fallPetal {
+            0%   { opacity: 0; transform: translateY(-20px) rotate(0deg) translateX(0); }
+            5%   { opacity: 0.6; }
+            95%  { opacity: 0.2; }
+            100% { opacity: 0; transform: translateY(105vh) rotate(540deg) translateX(40px); }
+        }
+
+        /* GATE */
+        #gate {
+            position: fixed; inset: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: center; padding: 2rem;
+            background: var(--paper);
+            transition: opacity 0.8s, transform 0.8s;
+        }
+        #gate.exit { opacity: 0; transform: scale(1.04); pointer-events: none; }
+        .gate-inner { text-align: center; max-width: 400px; width: 100%; }
+        .gate-kanji {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 5rem; font-weight: 300; color: var(--sakura);
+            line-height: 1; margin-bottom: 0.25rem; opacity: 0.7;
+        }
+        .gate-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem; font-style: italic; color: var(--soft-ink); margin-bottom: 0.4rem;
+        }
+        .gate-hint { font-size: 0.72rem; letter-spacing: 0.12em; color: var(--subtle); text-transform: uppercase; margin-bottom: 2.5rem; }
+        .gate-divider { width: 40px; height: 1px; background: var(--sakura); margin: 1.2rem auto; opacity: 0.5; }
+        .gate-input {
+            width: 100%; border: none; border-bottom: 1.5px solid var(--subtle);
+            background: transparent; padding: 0.75rem 0;
+            font-family: 'Cormorant Garamond', serif; font-size: 1.2rem;
+            text-align: center; color: var(--ink); outline: none; transition: border-color 0.3s; margin-bottom: 2rem;
+        }
+        .gate-input:focus { border-color: var(--sakura-deep); }
+        .gate-input::placeholder { color: var(--subtle); font-style: italic; font-size: 1rem; }
+        .gate-btn {
+            display: inline-flex; align-items: center; gap: 0.6rem;
+            padding: 0.75rem 2.5rem; border: 1.5px solid var(--sakura); background: transparent;
+            color: var(--sakura-deep); font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem; letter-spacing: 0.08em; cursor: pointer; transition: all 0.3s;
+        }
+        .gate-btn:hover { background: var(--sakura); color: white; }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .shake { animation: shake 0.35s ease; }
+
+        /* MAIN */
+        #main { position: relative; z-index: 5; }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center; padding: 6rem 2rem 4rem; position: relative; overflow: hidden;
+        }
+        .hero-bg-kanji {
+            position: absolute; font-family: 'Noto Serif JP', serif;
+            font-size: 28vw; font-weight: 300; color: var(--sakura); opacity: 0.05;
+            user-select: none; pointer-events: none; line-height: 1;
+        }
+        .hero-eyebrow {
+            font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase;
+            color: var(--sakura-deep); margin-bottom: 2rem;
+            opacity: 0; animation: fadeUp 1s 0.2s forwards;
+        }
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3.5rem, 11vw, 8rem); font-weight: 300; line-height: 1;
+            color: var(--ink); margin-bottom: 1rem;
+            opacity: 0; animation: fadeUp 1s 0.4s forwards;
+        }
+        .hero-title em { font-style: italic; color: var(--sakura-deep); }
+        .hero-jp {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(1rem, 3vw, 1.6rem); font-weight: 300; color: var(--muted);
+            letter-spacing: 0.2em; margin-bottom: 1.5rem;
+            opacity: 0; animation: fadeUp 1s 0.6s forwards;
+        }
+        .hero-sub {
+            font-family: 'Cormorant Garamond', serif; font-style: italic;
+            font-size: clamp(1rem, 2.5vw, 1.3rem); color: var(--soft-ink);
+            opacity: 0; animation: fadeUp 1s 0.8s forwards; max-width: 500px;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero-scroll {
+            position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+            color: var(--subtle); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+            animation: fadeUp 1s 1.5s forwards; opacity: 0;
+        }
+        .scroll-line {
+            width: 1px; height: 40px;
+            background: linear-gradient(to bottom, var(--subtle), transparent);
+            animation: scrollLine 2s 2s ease-in-out infinite;
+        }
+        @keyframes scrollLine {
+            0%,100% { transform: scaleY(1); opacity: 0.4; }
+            50% { transform: scaleY(0.5); opacity: 0.8; }
+        }
+
+        /* DIVIDER */
+        .torii-divider {
+            display: flex; align-items: center; justify-content: center; padding: 2rem 0;
+            background: var(--cream);
+        }
+        .torii-divider::before, .torii-divider::after {
+            content: ''; flex: 1; height: 1px; max-width: 120px;
+            background: linear-gradient(to right, transparent, var(--subtle)); margin: 0 1.5rem;
+        }
+        .torii-divider::after { background: linear-gradient(to left, transparent, var(--subtle)); }
+        .torii-icon { font-size: 1.4rem; color: var(--sakura); opacity: 0.6; }
+
+        /* WISHES */
+        .wishes-section { padding: 5rem 2rem; background: var(--warm); }
+        .section-label {
+            text-align: center; font-size: 0.65rem; letter-spacing: 0.3em;
+            text-transform: uppercase; color: var(--sakura-deep); margin-bottom: 1rem;
+        }
+        .section-heading {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 400;
+            text-align: center; color: var(--ink); margin-bottom: 0.5rem;
+        }
+        .section-jp {
+            font-family: 'Noto Serif JP', serif; font-size: 0.85rem;
+            color: var(--muted); text-align: center; letter-spacing: 0.2em; margin-bottom: 4rem;
+        }
+        .wish-grid {
+            max-width: 900px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;
+        }
+        .wish-card {
+            background: var(--paper); padding: 2rem;
+            border-top: 2px solid var(--sakura); position: relative; overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .wish-card::before {
+            content: attr(data-kanji); position: absolute; right: -0.5rem; bottom: -1rem;
+            font-family: 'Noto Serif JP', serif; font-size: 5rem; font-weight: 300;
+            color: var(--sakura); opacity: 0.08; line-height: 1; pointer-events: none;
+        }
+        .wish-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(200,120,144,0.12); }
+        .wish-num {
+            font-family: 'Cormorant Garamond', serif; font-size: 0.75rem;
+            letter-spacing: 0.2em; color: var(--sakura-deep); margin-bottom: 0.75rem; text-transform: uppercase;
+        }
+        .wish-title {
+            font-family: 'Cormorant Garamond', serif; font-size: 1.25rem;
+            font-style: italic; color: var(--ink); margin-bottom: 0.75rem; line-height: 1.4;
+        }
+        .wish-body { font-size: 0.85rem; line-height: 1.8; color: var(--muted); }
+
+        /* LETTER */
+        .letter-section { padding: 6rem 2rem; background: var(--paper); }
+        .letter-wrap { max-width: 620px; margin: 0 auto; }
+        .letter-stamp {
+            width: 60px; height: 60px; border: 2px solid var(--sakura);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Noto Serif JP', serif; font-size: 1.5rem;
+            color: var(--sakura-deep); margin-bottom: 2rem; opacity: 0.6;
+        }
+        .letter-date { font-size: 0.72rem; letter-spacing: 0.15em; color: var(--subtle); text-transform: uppercase; margin-bottom: 2.5rem; }
+        .letter-body {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.15rem; line-height: 2.1; color: var(--soft-ink); font-weight: 300;
+        }
+        .letter-body p { margin-bottom: 1.5rem; }
+        .letter-body .highlight { font-style: italic; color: var(--sakura-deep); }
+        .letter-sig {
+            margin-top: 3rem; font-family: 'Cormorant Garamond', serif;
+            font-style: italic; font-size: 1.1rem; color: var(--muted);
+        }
+        .letter-sig span {
+            display: block; font-family: 'Noto Serif JP', serif; font-size: 0.8rem;
+            letter-spacing: 0.15em; color: var(--subtle); margin-top: 0.3rem;
+        }
+
+        /* VOCAB */
+        .vocab-section {
+            padding: 5rem 2rem; background: var(--ink); color: white;
+            overflow: hidden; position: relative;
+        }
+        .vocab-section::before {
+            content: '頑張れ'; position: absolute;
+            font-family: 'Noto Serif JP', serif; font-size: 20vw; font-weight: 300;
+            opacity: 0.03; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; white-space: nowrap;
+        }
+        .vocab-grid {
+            max-width: 800px; margin: 3rem auto 0;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;
+        }
+        .vocab-card {
+            border: 1px solid rgba(255,255,255,0.08); padding: 1.5rem;
+            transition: background 0.3s;
+        }
+        .vocab-card:hover { background: rgba(255,255,255,0.04); }
+        .vocab-jp { font-family: 'Noto Serif JP', serif; font-size: 1.8rem; font-weight: 300; color: var(--sakura); margin-bottom: 0.25rem; }
+        .vocab-ro { font-size: 0.7rem; letter-spacing: 0.15em; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 0.5rem; }
+        .vocab-id { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1rem; color: rgba(255,255,255,0.5); }
+
+        /* SCRATCH */
+        .scratch-section { padding: 6rem 2rem; background: var(--warm); text-align: center; }
+        .scratch-container { position: relative; width: 320px; height: 180px; margin: 2.5rem auto 0; overflow: hidden; }
+        .scratch-reveal {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; background: var(--paper);
+            border: 1px solid var(--subtle); padding: 1.5rem; gap: 0.5rem;
+        }
+        .scratch-reveal-jp { font-family: 'Noto Serif JP', serif; font-size: 1.3rem; color: var(--sakura-deep); }
+        .scratch-reveal-id { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.9rem; color: var(--muted); }
+        .scratch-reveal-code {
+            font-family: 'DM Sans', monospace; font-size: 0.75rem; letter-spacing: 0.12em;
+            color: var(--ink); background: var(--warm); padding: 0.3rem 0.8rem;
+            border: 1px dashed var(--subtle); margin-top: 0.25rem;
+        }
+        canvas#scratch-canvas { position: absolute; inset: 0; cursor: crosshair; }
+        .scratch-hint { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--subtle); margin-top: 1rem; }
+
+        /* FOOTER */
+        footer { padding: 3rem 2rem; background: var(--ink); text-align: center; }
+        .footer-jp { font-family: 'Noto Serif JP', serif; font-size: 1.2rem; font-weight: 300; color: var(--sakura); opacity: 0.5; margin-bottom: 0.75rem; letter-spacing: 0.2em; }
+        .footer-text { font-size: 0.72rem; letter-spacing: 0.12em; color: rgba(255,255,255,0.2); text-transform: uppercase; }
+        .footer-text span { color: var(--sakura); opacity: 0.6; }
     </style>
 </head>
-<body class="bg-black text-white overflow-x-hidden">
+<body>
 
-    <section class="h-screen flex flex-col justify-center items-center p-5">
-        <div class="w-full max-w-2xl bg-gray-900 p-6 rounded-lg border border-green-500 shadow-lg shadow-green-500/20">
-            <div class="terminal-text text-green-500 mb-4">> SYSTEM_INITIALIZING...</div>
-            <div class="terminal-text text-green-500 mb-4">> ACCESS_DENIED. PLEASE IDENTIFY.</div>
-            <div id="quest-area">
-                <p class="mb-2 italic text-gray-400">"Apa nama tempat pertama kali kita makan bareng?"</p>
-                <input type="text" id="password" class="bg-transparent border-b border-green-500 outline-none text-green-400 w-full mb-4">
-                <button onclick="checkAccess()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition">Verify Identity</button>
+<div id="petals"></div>
+
+<!-- GATE -->
+<div id="gate">
+    <div class="gate-inner">
+        <div class="gate-kanji">桜</div>
+        <p class="gate-title">Ada sesuatu untukmu di sini.</p>
+        <div class="gate-divider"></div>
+        <p class="gate-hint">// kata panikmu yang paling ikonik</p>
+        <input type="text" id="password" class="gate-input" placeholder="ketikkan di sini…" />
+        <br>
+        <button class="gate-btn" onclick="checkAccess()">
+            <span>開く</span>
+            <span style="font-family:'DM Sans',sans-serif;font-size:0.75rem;letter-spacing:0.05em;">Buka</span>
+        </button>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+    <section class="hero">
+        <div class="hero-bg-kanji">夢</div>
+        <p class="hero-eyebrow">Happy Birthday</p>
+        <h1 class="hero-title">
+            Selamat<br>
+            <em>Ulang Tahun</em>
+        </h1>
+        <p class="hero-jp">お誕生日おめでとう</p>
+        <p class="hero-sub">Untuk kamu yang sedang berjuang keras — dari jauh, aku bangga.</p>
+        <div class="hero-scroll">
+            <div class="scroll-line"></div>
+            <span>scroll</span>
+        </div>
+    </section>
+
+    <div class="torii-divider"><span class="torii-icon">⛩</span></div>
+
+    <section class="wishes-section">
+        <p class="section-label">Doa &amp; Harapan</p>
+        <h2 class="section-heading">Semoga kamu…</h2>
+        <p class="section-jp">願いを込めて</p>
+
+        <div class="wish-grid">
+            <div class="wish-card" data-kanji="言">
+                <p class="wish-num">願い 壱</p>
+                <h3 class="wish-title">…lancar berbicara bahasa Jepang suatu hari nanti</h3>
+                <p class="wish-body">Setiap kanji yang kamu hafal, setiap pola kalimat yang kamu ulang di malam hari — itu semua bata-bata jalan yang sedang kamu bangun sendiri menuju ke sana.</p>
+            </div>
+            <div class="wish-card" data-kanji="夢">
+                <p class="wish-num">願い 弐</p>
+                <h3 class="wish-title">…tidak pernah berhenti percaya pada mimpimu</h3>
+                <p class="wish-body">Jepang bukan cuma destinasi. Dia adalah bukti bahwa kamu mau melampaui rasa nyaman. Dan itu butuh keberanian yang luar biasa.</p>
+            </div>
+            <div class="wish-card" data-kanji="強">
+                <p class="wish-num">願い 参</p>
+                <h3 class="wish-title">…kuat di hari-hari yang paling berat sekalipun</h3>
+                <p class="wish-body">Belajar bahasa baru itu melelahkan. Ada hari di mana rasanya nggak maju-maju. Tapi kamu masih di sini, masih belajar. Itu bukan hal kecil.</p>
+            </div>
+            <div class="wish-card" data-kanji="花">
+                <p class="wish-num">願い 四</p>
+                <h3 class="wish-title">…bisa melihat bunga sakura mekar langsung di sana</h3>
+                <p class="wish-body">Bukan dari foto, bukan dari video — tapi langsung dengan matamu sendiri, di jalan yang sudah kamu perjuangkan untuk sampai ke sana.</p>
+            </div>
+            <div class="wish-card" data-kanji="幸">
+                <p class="wish-num">願い 五</p>
+                <h3 class="wish-title">…bahagia, di manapun kamu berada</h3>
+                <p class="wish-body">Jarak membuat aku nggak bisa ada di sisimu hari ini. Tapi semoga kamu tahu — doaku selalu ikut bersamamu, ke manapun langkahmu membawa pergi.</p>
+            </div>
+            <div class="wish-card" data-kanji="道">
+                <p class="wish-num">願い 六</p>
+                <h3 class="wish-title">…menemukan jalanmu, dan berjalan tanpa ragu</h3>
+                <p class="wish-body">Kamu sudah memilih jalan yang tidak mudah. Tapi orang yang paling berharga justru adalah yang berani menempuh jalan itu.</p>
             </div>
         </div>
     </section>
 
-    <main id="main-content" class="hidden">
-        
-        <section class="py-20 px-10">
-            <h2 class="text-4xl font-bold text-center mb-10" data-aos="fade-up">Our Timeline</h2>
-            <div class="space-y-20">
-                <div class="flex flex-col md:flex-row items-center" data-aos="fade-right">
-                    <div class="w-full md:w-1/2 p-4 text-2xl">"Hari di mana semuanya dimulai..."</div>
-                    <div class="w-full md:w-1/2 bg-gray-800 h-64 rounded-lg flex items-center justify-center">[Foto 1]</div>
+    <div class="torii-divider"><span class="torii-icon">🌸</span></div>
+
+    <section class="letter-section">
+        <div class="letter-wrap">
+            <div class="letter-stamp">手</div>
+            <p class="letter-date">Dari jauh — untukmu, hari ini</p>
+
+            <div class="letter-body">
+                <p>Hei.</p>
+                <p>
+                    Hari ini kamu genap setahun lebih tua — dan setahun lebih dekat ke impian yang kamu kejar itu.
+                    Jepang. Bahasa yang kamu pelajari dengan sabar, kanji per kanji, pola kalimat per pola kalimat.
+                    Aku tahu itu bukan hal yang gampang.
+                </p>
+                <p>
+                    Aku tahu ada malam di mana kamu jenuh. Di mana rasanya kepala penuh tapi tetap aja <span class="highlight">nggak ngerti kenapa aku harus hafal ini semua</span>. Aku tahu juga ada hari di mana kamu hampir nyerah — tapi besoknya kamu buka buku itu lagi. Mulai lagi.
+                </p>
+                <p>
+                    Dan itu, menurutku, adalah salah satu hal paling luar biasa tentang kamu.
+                </p>
+                <p>
+                    Semoga tahun ke-19 ini menjadi tahun di mana bahasa itu mulai terasa lebih akrab.
+                    Semoga kamu makin sering <span class="highlight">mimpi dalam bahasa Jepang</span> — pertanda otakmu sudah mulai menerimanya sebagai bagian dari dirimu.
+                    Semoga setiap kata yang kamu ucap pagi hari terasa sedikit lebih alami.
+                </p>
+                <p>
+                    Aku nggak ada di sisimu hari ini. Jarak itu nyata, dan kadang memang berat.
+                    Tapi percayalah — dari sini, aku melihatmu berjuang, dan aku bangga.
+                </p>
+                <p>
+                    <span class="highlight">頑張って。</span> Terus berjuang ya.
+                </p>
+            </div>
+
+            <div class="letter-sig">
+                — Semangat, fokus dengan diri sendiri.
+                <span>Mari bertemu di versi terbaik diri kita masing masing 🌸</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="vocab-section">
+        <div style="max-width:800px;margin:0 auto;position:relative;z-index:2;">
+            <p class="section-label" style="color:rgba(232,180,192,0.6);">Kosakata Untukmu</p>
+            <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:300;text-align:center;color:white;margin-bottom:0.5rem;">Kata-kata yang aku kirimkan<br><em style="font-style:italic;color:var(--sakura);">dari jauh</em></h2>
+            <p style="text-align:center;font-family:'Noto Serif JP',serif;font-size:0.8rem;color:rgba(255,255,255,0.2);letter-spacing:0.2em;margin-bottom:0;">贈り物の言葉</p>
+
+            <div class="vocab-grid">
+                <div class="vocab-card">
+                    <div class="vocab-jp">頑張れ</div>
+                    <div class="vocab-ro">Ganbare</div>
+                    <div class="vocab-id">"Teruslah berjuang"</div>
                 </div>
-                <div class="flex flex-col md:flex-row-reverse items-center" data-aos="fade-left">
-                    <div class="w-full md:w-1/2 p-4 text-2xl text-right">"Petualangan pertama kita."</div>
-                    <div class="w-full md:w-1/2 bg-gray-800 h-64 rounded-lg flex items-center justify-center">[Foto 2]</div>
+                <div class="vocab-card">
+                    <div class="vocab-jp">夢</div>
+                    <div class="vocab-ro">Yume</div>
+                    <div class="vocab-id">"Mimpi"</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="vocab-jp">大丈夫</div>
+                    <div class="vocab-ro">Daijoubu</div>
+                    <div class="vocab-id">"Kamu akan baik-baik saja"</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="vocab-jp">未来</div>
+                    <div class="vocab-ro">Mirai</div>
+                    <div class="vocab-id">"Masa depan"</div>
+                </div>
+                <div class="vocab-card">
+                    <div class="vocab-jp">一歩</div>
+                    <div class="vocab-ro">Ippo</div>
+                    <div class="vocab-id">"Satu langkah"</div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="py-20 bg-gray-900 text-center">
-            <h2 class="text-3xl font-bold mb-6">Gosok untuk lihat pesan rahasia</h2>
-            <div class="scratch-container">
-                <div class="absolute inset-0 flex items-center justify-center bg-white text-black p-4 rounded text-center">
-                    "Kamu adalah alasan aku terus belajar koding setiap hari. Happy Birthday!"
-                </div>
-                <canvas id="scratch-canvas" width="300" height="200"></canvas>
+    <div class="torii-divider"><span class="torii-icon">🎋</span></div>
+
+    <section class="scratch-section">
+        <p class="section-label">Secret Reward</p>
+        <h2 class="section-heading">Satu hadiah kecil<br><em style="font-style:italic;color:var(--sakura-deep);">buatmu</em></h2>
+        <p style="font-family:'Noto Serif JP',serif;font-size:0.8rem;color:var(--subtle);letter-spacing:0.2em;margin-top:0.25rem;">ゴシゴシ</p>
+
+        <div class="scratch-container">
+            <div class="scratch-reveal">
+                <div class="scratch-reveal-jp">🌸 おめでとう 🌸</div>
+                <div class="scratch-reveal-id">Ku usahakan pertemuan kita di jepang</div>
+                <div class="scratch-reveal-code">KODE: RAMEN-BARENG-SUATU-HARI</div>
             </div>
-        </section>
+            <canvas id="scratch-canvas" width="320" height="180"></canvas>
+        </div>
+        <p class="scratch-hint">✦ gosok untuk reveal ✦</p>
+    </section>
 
-        <section class="py-20 px-5 max-w-4xl mx-auto">
-            <div class="bg-gradient-to-br from-green-400 to-blue-500 p-8 rounded-3xl text-black">
-                <h2 class="text-3xl font-black mb-6 italic text-center">YOUR YEAR IN REVIEW</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-white/20 p-4 rounded-xl">
-                        <p class="text-xs uppercase font-bold text-black/60">Total Memories</p>
-                        <p class="text-2xl font-bold">365 Days</p>
-                    </div>
-                    <div class="bg-white/20 p-4 rounded-xl">
-                        <p class="text-xs uppercase font-bold text-black/60">Laugh Tracks</p>
-                        <p class="text-2xl font-bold">Infinite</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <footer>
+        <p class="footer-jp">いつもそばにいるよ</p>
+        <p class="footer-text">
+            Dibuat dengan rindu — oleh <span>[nama kamu]</span> — untuk seseorang yang sedang berjuang menuju impiannya 🌸
+        </p>
+    </footer>
 
-    </main>
+</div>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    <script>
-        AOS.init();
+<script>
+    // Petals
+    const petalContainer = document.getElementById('petals');
+    const colors = ['#e8b4c0','#f5d0d8','#d4a8b8','#ead4e0','#f0c8d0'];
+    for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.className = 'petal';
+        const size = 6 + Math.random() * 10;
+        p.style.cssText = `left:${Math.random()*100}%;width:${size}px;height:${size*1.3}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:50% 10% 50% 10%;animation-duration:${10+Math.random()*15}s;animation-delay:${Math.random()*15}s;transform:rotate(${Math.random()*360}deg);`;
+        petalContainer.appendChild(p);
+    }
 
-        function checkAccess() {
-            const pass = document.getElementById('password').value.toLowerCase();
-            if(pass === 'kantin') { // Ganti dengan jawabanmu
-                document.getElementById('main-content').classList.remove('hidden');
-                window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-                confetti();
-            } else {
-                alert('Wrong Answer! Coba ingat lagi.');
-            }
+    // Gate
+    function checkAccess() {
+        const val = document.getElementById('password').value.toLowerCase().trim();
+        if (val === 'anjir') {
+            const gate = document.getElementById('gate');
+            gate.classList.add('exit');
+            setTimeout(() => gate.style.display = 'none', 800);
+            const sakura = ['#e8b4c0','#f5d0d8','#c8989a','#d4a8c0','#c8983a'];
+            confetti({ particleCount: 80, spread: 70, origin: {y:0.5}, colors: sakura, shapes:['circle'] });
+            setTimeout(() => confetti({ particleCount: 50, spread: 90, origin:{x:0.1,y:0.3}, colors: sakura, shapes:['circle'] }), 400);
+            setTimeout(() => confetti({ particleCount: 50, spread: 90, origin:{x:0.9,y:0.3}, colors: sakura, shapes:['circle'] }), 700);
+        } else {
+            const inner = document.querySelector('.gate-inner');
+            inner.classList.add('shake');
+            const inp = document.getElementById('password');
+            inp.style.borderColor = '#c87890';
+            setTimeout(() => { inner.classList.remove('shake'); inp.style.borderColor = ''; }, 400);
         }
+    }
+    document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') checkAccess(); });
 
-        // Scratch Card Logic
-        const canvas = document.getElementById('scratch-canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#888';
-        ctx.fillRect(0, 0, 300, 200);
+    // Scratch card
+    const canvas = document.getElementById('scratch-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#d4aab8';
+    ctx.fillRect(0, 0, 320, 180);
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1;
+    for (let y = 0; y < 180; y += 16) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(320, y); ctx.stroke();
+    }
+    ctx.font = "500 13px 'DM Sans', sans-serif";
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.textAlign = 'center';
+    ctx.fillText('✦  gosok di sini  ✦', 160, 88);
+    ctx.font = "300 11px 'DM Sans', sans-serif";
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillText('hadiah rahasiamu menunggu', 160, 108);
 
-        let isDrawing = false;
-        canvas.addEventListener('mousedown', () => isDrawing = true);
-        canvas.addEventListener('mouseup', () => isDrawing = false);
-        canvas.addEventListener('mousemove', (e) => {
-            if(!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath();
-            ctx.arc(x, y, 20, 0, Math.PI * 2);
-            ctx.fill();
-        });
-    </script>
+    let drawing = false;
+    function doScratch(e) {
+        if (!drawing) return;
+        const r = canvas.getBoundingClientRect();
+        const x = ((e.clientX ?? e.touches?.[0]?.clientX) || 0) - r.left;
+        const y = ((e.clientY ?? e.touches?.[0]?.clientY) || 0) - r.top;
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath(); ctx.arc(x, y, 26, 0, Math.PI*2); ctx.fill();
+    }
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('mouseleave', () => drawing = false);
+    canvas.addEventListener('mousemove', doScratch);
+    canvas.addEventListener('touchstart', e => { drawing = true; e.preventDefault(); }, {passive:false});
+    canvas.addEventListener('touchend', () => drawing = false);
+    canvas.addEventListener('touchmove', e => { doScratch(e); e.preventDefault(); }, {passive:false});
+</script>
 </body>
 </html>
